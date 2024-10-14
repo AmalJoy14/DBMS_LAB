@@ -1,0 +1,2 @@
+-- Create a trigger to insert the deleted rows from emp_details to another table and updated rows to another table.
+--(Create the tables deleted and updated)
