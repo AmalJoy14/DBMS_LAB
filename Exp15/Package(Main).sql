@@ -66,3 +66,17 @@ begin
   res2 := pk1.fn22(p,q,r);
   dbms_output.put_line('Sum of 3 numbers p,q,r :'|| res2);
 end;
+
+--INPUT--
+p : 2
+q : 3
+r : 4
+n : 5
+
+--OUTPUT--
+Sum:5
+Average:2.5
+Product:6
+Square root:2.23606797749978969640917366873127623544
+The number is odd
+Sum of 3 numbers p,q,r :9
