@@ -1,0 +1,87 @@
+CREATE TABLE Items (itemid INT PRIMARY KEY, Itemname VARCHAR(50),category VARCHAR(50),Price INT, Instock INT CHECK (Instock >= 0));
+
+CREATE TABLE Customers (custid INT PRIMARY KEY, Custname VARCHAR(100), Address VARCHAR(255), state VARCHAR(50));
+
+CREATE TABLE ORDERS2 ( ORDERID INT PRIMARY KEY, ITEMID INT, CUSTID INT, Quantity INT, ORDERDATE DATE, FOREIGN KEY (ITEMID) REFERENCES ITEMS, FOREIGN KEY (Custid) REFERENCES Customers);
+
+CREATE TABLE Delivery (deliveryid INT PRIMARY KEY, Custid INT, Orderid INT,FOREIGN KEY (Custid) REFERENCES Customers, FOREIGN KEY (Orderid) REFERENCES Orders);
+
+INSERT INTO Items VALUES (1, 'Laptop', 'Electronics', 999, 50);
+INSERT INTO Items VALUES (2, 'Smartphone', 'Electronics', 499, 150);
+INSERT INTO Items VALUES (3, 'Desk Chair', 'Furniture', 89, 75);
+INSERT INTO Items VALUES (4, 'Blender', 'Appliances', 29, 120);
+INSERT INTO Items VALUES (5, 'Notebook', 'Stationery', 2, 500);
+INSERT INTO Items VALUES (6, 'Samsung Galaxy S4', 'Electronics', 299, 30);
+INSERT INTO Items VALUES (7, 'High-End Monitor', 'Electronics', 1200, 20);
+INSERT INTO ITEMS VALUES (8, 'Office Desk', 'Furniture', 150, 40);
+
+
+INSERT INTO Customers VALUES (1, 'Alice Johnson', '123 Maple St', 'CA');
+INSERT INTO Customers VALUES (2, 'Bob Smith', '456 Oak Ave', 'NY');
+INSERT INTO Customers VALUES (3, 'Charlie Brown', '789 Pine Rd', 'TX');
+INSERT INTO Customers VALUES (4, 'Diana Prince', '321 Elm St', 'FL');
+INSERT INTO Customers VALUES (5, 'Edward Norton', '654 Birch Blvd', 'WA');
+INSERT INTO Customers VALUES (6, 'Mickey', '101 Disney Ln', 'CA');
+INSERT INTO CUSTOMERS VALUES (7, 'Jessica Alba', '202 Star Blvd', 'NY');
+
+
+INSERT INTO ORDERS2 VALUES (1, 1, 1, 1, '01-09-24');
+INSERT INTO ORDERS2 VALUES (2, 2, 2, 2, '02-09-24');
+INSERT INTO ORDERS2 VALUES (3, 3, 3, 1, '03-09-24');
+INSERT INTO ORDERS2 VALUES (4, 4, 4, 3, '04-09-24');
+INSERT INTO ORDERS2 VALUES (5, 5, 5, 5, '05-09-24');
+INSERT INTO ORDERS2 VALUES (6, 6, 6, 1, '01-02-24');
+INSERT INTO ORDERS2 VALUES (7, 7, 7, 2, '15-08-24');
+INSERT INTO ORDERS2 VALUES (8, 8, 4, 1, '10-09-24');
+
+
+INSERT INTO Delivery VALUES (1, 1, 1);
+INSERT INTO Delivery VALUES (2, 2, 2);
+INSERT INTO Delivery VALUES (3, 4, 4);
+INSERT INTO DELIVERY VALUES (4, 5, 5);
+INSERT INTO DELIVERY VALUES (5, 6, 6);
+
+SELECT c.custid,custname,address,state from customers c join orders2 o on c.CUSTID = o.CUSTID;
+
+SELECT C.CUSTID,CUSTNAME,ADDRESS,STATE FROM CUSTOMERS C JOIN ORDERS2 O  ON C.CUSTID = O.CUSTID JOIN DELIVERY D ON O.ORDERID = D.ORDERID;
+
+SELECT ORDERDATE FROM ORDERS2 O JOIN CUSTOMERS C ON C.CUSTID = O.CUSTID WHERE C.CUSTNAME LIKE 'J%';
+
+select itemname,price from items i join orders2 o on i.itemid = o.itemid join customers c on c.custid = o.custid where custName = 'Mickey';
+
+SELECT C.* FROM CUSTOMERS C JOIN ORDERS2 O ON C.CUSTID = O.CUSTID LEFT JOIN DELIVERY D ON O.ORDERID = D.ORDERID WHERE O.ORDERDATE > '13-01-31' AND D.DELIVERYID IS NULL;
+
+SELECT DISTINCT ITEMID FROM ORDERS2 UNION SELECT DISTINCT I.ITEMID FROM ITEMS I LEFT JOIN Delivery d ON i.itemid = d.Orderid WHERE D.DELIVERYID IS NULL;
+
+SELECT DISTINCT c.Custname FROM Customers c JOIN Orders2 o ON c.custid = o.Custid JOIN DELIVERY D ON O.ORDERID = D.ORDERID;
+
+SELECT DISTINCT C.CUSTNAME FROM CUSTOMERS C JOIN ORDERS2 O ON C.CUSTID = O.CUSTID LEFT JOIN Delivery d ON o.orderid = d.Orderid WHERE d.deliveryid IS NULL MINUS SELECT DISTINCT c.Custname FROM Customers c JOIN Orders2 o ON c.custid = o.Custid JOIN DELIVERY D ON O.ORDERID = D.ORDERID;
+
+
+SELECT Custname
+FROM (
+    SELECT c.Custname, COUNT(o.orderid) AS order_count
+    FROM CUSTOMERS C
+    JOIN Orders2 o ON c.custid = o.Custid
+    GROUP BY c.Custname
+    ORDER BY COUNT(o.orderid) DESC
+)
+WHERE ROWNUM = 1;
+
+
+SELECT DISTINCT C.* FROM CUSTOMERS C JOIN ORDERS O ON C.CUSTID = O.CUSTID JOIN Items i ON o.Itemid = i.itemid WHERE I.PRICE > 5000;
+
+SELECT DISTINCT C.CUSTNAME, C.ADDRESS FROM Customers c LEFT JOIN ORDERS2 O ON C.CUSTID = O.CUSTID LEFT JOIN Items i ON o.Itemid = i.itemid WHERE I.ITEMNAME != 'Samsung Galaxy S4' OR I.ITEMNAME IS NULL;
+
+SELECT C.*, O.* FROM Customers c LEFT JOIN ORDERS2 O ON C.CUSTID = O.CUSTID;
+
+SELECT STATE, COUNT(*) AS CUSTOMER_COUNT FROM Customers GROUP BY STATE;
+
+WITH AveragePrice AS (
+    SELECT AVG(Price) AS avg_price
+    FROM Items
+)
+SELECT category, itemid, Itemname, Price
+FROM Items
+WHERE Price > (SELECT avg_price FROM AveragePrice)
+GROUP BY CATEGORY, ITEMID, ITEMNAME, PRICE;
