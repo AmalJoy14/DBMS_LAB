@@ -2,7 +2,9 @@ set serveroutput on;
 show serveroutput;
 
 create or replace function factorial(n int)
-return int as fact int;
+return int 
+as 
+  fact int;
 
 begin
   fact:=1;
