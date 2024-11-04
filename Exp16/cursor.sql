@@ -10,20 +10,37 @@ select * from bank_details;
 
 create table banknew(accno int ,intr int);
 
-declare cursor temp is
-  select accno,cname,balance,adate from bank_details;
-  tempvar temp %rowtype;
-  intr int;
+-- declare cursor temp is
+--   select accno,cname,balance,adate from bank_details;
+--   tempvar temp %rowtype;
+--   intr int;
   
-begin 
-  open temp;
-  loop
-    fetch temp into tempvar;
-    exit when temp%notfound;
-    intr := .08*tempvar.balance; 
-    insert into banknew values(tempvar.accno,intr); 
-  end loop;
-  close temp; 
-end; 
+-- begin 
+--   open temp;
+--   loop
+--     fetch temp into tempvar;
+--     exit when temp%notfound;
+--     intr := .08*tempvar.balance; 
+--     insert into banknew values(tempvar.accno,intr); 
+--   end loop;
+--   close temp; 
+-- end; 
+-------------------------------------
+DECLARE
+  CURSOR temp IS
+    SELECT accno, cname, balance, adate FROM bank_details;
+  tempvar temp%ROWTYPE;
+  intr INT;
+BEGIN
+  OPEN temp;
+  LOOP
+    FETCH temp INTO tempvar;
+    EXIT WHEN temp%NOTFOUND;
+    intr := 0.08 * tempvar.balance; 
+    INSERT INTO banknew VALUES (tempvar.accno, intr); 
+  END LOOP;
+  CLOSE temp;
+END;
+/
 
 select * from banknew;
